@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Web.Http;
-using EmployeeManagement.Domain.DomainInterfaces;
+using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Mappings;
 using EmployeeManagement.Domain.Models;
 using EmployeeManagement.WebUI.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagement.WebUI.Areas.API.Controllers
 {
-    public class EmployeeController : ApiController
+    public class EmployeeController : Controller
     {
         private readonly IEmployeeService _employeeService;
         private readonly IMapperWrapper _mapperWrapper;
@@ -19,25 +19,30 @@ namespace EmployeeManagement.WebUI.Areas.API.Controllers
         }
 
         [HttpGet]
+        [Route("/employee/{id}")]
         public EmployeeViewModel GetById(int id)
         {
             return _mapperWrapper.Map<EmployeeModel, EmployeeViewModel>(_employeeService.GetById(id));
         }
 
         [HttpGet]
+        [Route("/department/{id}/employees")]
         public List<EmployeeViewModel> GetByDepartmentId(int id)
         {
             return _mapperWrapper.Map<List<EmployeeModel>, List<EmployeeViewModel>>(_employeeService.GetByDepartmentId(id));
         }
 
         [HttpGet]
+        [Route("")]
+        [Route("/employee")]
         public List<EmployeeViewModel> GetAll()
         {
             return _mapperWrapper.Map<List<EmployeeModel>, List<EmployeeViewModel>>(_employeeService.GetAll());
         }
 
         [HttpPost]
-        public EmployeeViewModel Create(EmployeeViewModel employeeModel)
+        [Route("/employee")]
+        public EmployeeViewModel Create([FromBody]EmployeeViewModel employeeModel)
         {
             _employeeService.Create(_mapperWrapper.Map<EmployeeViewModel, EmployeeModel>(employeeModel));
 
@@ -45,11 +50,13 @@ namespace EmployeeManagement.WebUI.Areas.API.Controllers
         }
 
         [HttpPut]
-        public void Update(EmployeeViewModel employeeModel)
+        [Route("/employee")]
+        public void Update([FromBody]EmployeeViewModel employeeModel)
         {
-            _employeeService.Save(_mapperWrapper.Map<EmployeeViewModel, EmployeeModel > (employeeModel));
+            _employeeService.Save(_mapperWrapper.Map<EmployeeViewModel, EmployeeModel>(employeeModel));
         }
 
+        [Route("/employee/{id}")]
         [HttpDelete]
         public void Delete(int id)
         {

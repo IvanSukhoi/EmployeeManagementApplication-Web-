@@ -1,10 +1,10 @@
-﻿using System.Web.Http;
-using EmployeeManagement.Domain.DomainInterfaces;
+﻿using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagement.WebUI.Areas.API.Controllers
 {
-    public class UserController : ApiController
+    public class UserController : Controller
     {
         private readonly IUserService _userService;
 
@@ -14,9 +14,10 @@ namespace EmployeeManagement.WebUI.Areas.API.Controllers
         }
 
         [HttpPost]
-        public UserModel GetUserModel(string[] userInformation)
+        [Route("/user")]
+        public UserModel GetUserModel([FromBody]string[] userInformation)
         {
-            return  _userService.GetUser(userInformation[0], userInformation[1]);
+            return _userService.GetUserModel(userInformation[0], userInformation[1]);
         }
     }
 }

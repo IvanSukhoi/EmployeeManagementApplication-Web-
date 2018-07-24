@@ -1,13 +1,12 @@
-using System.Data.Entity;
 using EmployeeManagement.DataEF.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManagement.DataEF.DAL
 {
     public class ManagementContext : DbContext
     {
-        public ManagementContext() : base("name=ManagementContext")
+        public ManagementContext() : base()
         {
-            Configuration.LazyLoadingEnabled = false;
         }
 
         public virtual DbSet<Department> Departments { get; set; }
@@ -15,8 +14,9 @@ namespace EmployeeManagement.DataEF.DAL
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<Settings> Settings { get; set; }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=EmployeeManagmentApp;Integrated Security=True");
         }
     }
 }

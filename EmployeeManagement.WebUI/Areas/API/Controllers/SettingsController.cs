@@ -1,10 +1,10 @@
-﻿using System.Web.Http;
-using EmployeeManagement.Domain.DomainInterfaces;
+﻿using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagement.WebUI.Areas.API.Controllers
 {
-    public class SettingsController : ApiController
+    public class SettingsController : Controller
     {
         private readonly ISettingsService _settingsService;
 
@@ -14,13 +14,15 @@ namespace EmployeeManagement.WebUI.Areas.API.Controllers
         }
 
         [HttpGet]
-        public SettingsModel GetById(int id)
+        [Route("/settings/{id}")]
+        public SettingsModel GetByUserId(int id)
         {
-            return _settingsService.GetById(id);
+            return _settingsService.GetByUserId(id);
         }
 
         [HttpPost]
-        public void Save(SettingsModel settings)
+        [Route("/settings")]
+        public void Save([FromBody]SettingsModel settings)
         {
             _settingsService.Save(settings);
         }
