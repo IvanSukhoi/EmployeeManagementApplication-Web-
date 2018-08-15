@@ -71,7 +71,6 @@ namespace EmployeeManagement.WebUI
             services.AddMvc();
 
             services.AddElmah(options => options.Path = "/elmah");
-            services.AddElmah(x => x.)
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
