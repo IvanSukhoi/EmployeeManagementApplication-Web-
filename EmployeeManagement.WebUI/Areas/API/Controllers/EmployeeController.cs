@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagement.WebUI.Areas.API.Controllers
 {
+    [Authorize]
     [Produces("application/json")]
     [Route("employee")]
     [LoggingFilter]
