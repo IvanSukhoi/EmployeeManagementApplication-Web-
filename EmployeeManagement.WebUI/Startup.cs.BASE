@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Text;
+using ElmahCore;
 using EmployeeManagement.DataEF.DAL;
 using EmployeeManagement.DataEF.DbProviders;
 using EmployeeManagement.DataEF.Entities;
@@ -11,6 +11,7 @@ using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Mappings;
 using EmployeeManagement.Domain.Models;
 using EmployeeManagement.Domain.Services;
+using EmployeeManagement.WebUI.Areas.API.Filters;
 using EmployeeManagement.WebUI.Helpers;
 using EmployeeManagement.WebUI.Identity;
 using EmployeeManagement.WebUI.Interfaces;
@@ -18,11 +19,9 @@ using EmployeeManagement.WebUI.JsonWebTokenAuthentication;
 using EmployeeManagement.WebUI.Mappings.MapperWrapper;
 using EmployeeManagement.WebUI.NLog;
 using EmployeeManagement.WebUI.Services;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -71,10 +70,8 @@ namespace EmployeeManagement.WebUI
 
             services.AddMvc();
 
-            services.AddElmah(options =>
-            {
-                options.Path = "/elmah";
-            });
+            services.AddElmah(options => options.Path = "/elmah");
+            services.AddElmah(x => x.)
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -84,25 +81,13 @@ namespace EmployeeManagement.WebUI
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseStaticFiles();
-            app.UseAuthentication();
-
-            app.MapWhen(context =>
-            {
-                if (!context.Request.GetUri().ToString().EndsWith("/elmah")) return false;
-                var role = context.User.Claims.SingleOrDefault(x => x.Type == "Admin")?.Value;
-
-                return role == null;
-
-            }, Handle);
-
             app.UseElmah();
-            app.UseMvc();
-        }
 
-        private static void Handle(IApplicationBuilder app)
-        {
-            app.Run(async context => { await context.Response.WriteAsync("Invalid access"); });
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
+            app.UseAuthentication();
+            app.UseMvc();
         }
 
         public void ConfigureJwtAuthServer(IServiceCollection services)
