@@ -9,7 +9,7 @@ namespace EmployeeManagement.Domain.Mappings.Profiles
         public DepartmentMappingProfile()
         {
             CreateMap<Department, DepartmentModel>()
-                .ForMember(s => s.Id, opt => opt.MapFrom(c => c.ID))
+                .ForMember(s => s.Id, opt => opt.MapFrom(c => c.Id))
                 .ForMember(s => s.QuantityEmployees, opt => opt.MapFrom(c => c.Employees.Count));
 
             CreateMap<DepartmentModel, Department>()

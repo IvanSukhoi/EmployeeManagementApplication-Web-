@@ -2,6 +2,7 @@
 using EmployeeManagement.DataEF.Enums;
 using EmployeeManagement.Domain.Models;
 using EmployeeManagement.WebUI.Mappings;
+using EmployeeManagement.WebUI.Mappings.MapperWrapper;
 using Xunit;
 
 namespace EmployeeManagement.Domain.Tests.Mappings
@@ -60,7 +61,7 @@ namespace EmployeeManagement.Domain.Tests.Mappings
         {
             Assert.Equal(settings.Language, settingsModel.Language);
             Assert.Equal(settings.Topic, settingsModel.Theme);
-            Assert.Equal(settings.UserID, settingsModel.UserId);
+            Assert.Equal(settings.UserId, settingsModel.UserId);
         }
 
         private void Init()
@@ -69,7 +70,7 @@ namespace EmployeeManagement.Domain.Tests.Mappings
             {
                 Language = Language.English,
                 Topic = Theme.Dark,
-                UserID = 1
+                UserId = 1
             };
 
             _settingsModel = new SettingsModel

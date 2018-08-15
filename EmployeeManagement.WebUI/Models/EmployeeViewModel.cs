@@ -1,9 +1,10 @@
 ﻿using EmployeeManagement.DataEF.Enums;
 using EmployeeManagement.WebUI.FluentValidator;
+using FluentValidation.Attributes;
 
 namespace EmployeeManagement.WebUI.Models
 {
-    [FluentValidation.Attributes.Validator(typeof(RegisterModelValidator))]
+    [Validator(typeof(RegisterModelValidator))]
     public class EmployeeViewModel
     {
         public int Id { get; set; }

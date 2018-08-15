@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using EmployeeManagement.DataEF.Enums;
 using EmployeeManagement.Domain.Models;
-using EmployeeManagement.WebUI.Mappings;
+using EmployeeManagement.WebUI.Mappings.MapperWrapper;
 using EmployeeManagement.WebUI.Models;
 using Xunit;
 

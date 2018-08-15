@@ -79,8 +79,8 @@ namespace EmployeeManagement.Domain.Tests.Services
             _employeeService.Create(employeeModel);
 
             Assert.Equal(4, _employees.Count);
-            Assert.Equal(4, _employees.Last().ID);
-            Assert.Equal(4, _employees.Last().DepartmentID);
+            Assert.Equal(4, _employees.Last().Id);
+            Assert.Equal(4, _employees.Last().DepartmentId);
         }
 
         [Fact]
@@ -94,7 +94,7 @@ namespace EmployeeManagement.Domain.Tests.Services
 
             _employeeService.Save(employeeModel);
 
-            Assert.Equal(2, _employees.First().DepartmentID);
+            Assert.Equal(2, _employees.First().DepartmentId);
         }
 
         private void Init()
@@ -103,26 +103,26 @@ namespace EmployeeManagement.Domain.Tests.Services
             {
                 new Employee
                 {
-                    ID = 1,
-                    DepartmentID = 1
+                    Id = 1,
+                    DepartmentId = 1
                 },
                 new Employee
                 {
-                    ID = 2,
-                    DepartmentID = 2
+                    Id = 2,
+                    DepartmentId = 2
                 },
                 new Employee
                 {
-                    ID = 3,
-                    DepartmentID = 2
+                    Id = 3,
+                    DepartmentId = 2
                 }
             };
 
             A.CallTo(() => _mapperWrapper.Map<Employee, EmployeeModel>(A<Employee>.That.Matches(x => x != null))).ReturnsLazily(
                 (Employee employee) => new EmployeeModel
                 {
-                    Id = employee.ID,
-                    DepartmentId = employee.DepartmentID
+                    Id = employee.Id,
+                    DepartmentId = employee.DepartmentId
                 });
 
             A.CallTo(() => _mapperWrapper.Map<Employee, EmployeeModel>(null)).Returns(null);
@@ -141,15 +141,15 @@ namespace EmployeeManagement.Domain.Tests.Services
             A.CallTo(() => _mapperWrapper.Map<EmployeeModel, Employee>(A<EmployeeModel>.Ignored))
                 .ReturnsLazily((EmployeeModel employeeModel) => new Employee
                 {
-                    ID = employeeModel.Id,
-                    DepartmentID = employeeModel.Id
+                    Id = employeeModel.Id,
+                    DepartmentId = employeeModel.Id
                 });
 
             A.CallTo(() => _mapperWrapper.Map(A<EmployeeModel>.Ignored, A<Employee>.Ignored)).Invokes(
                 (EmployeeModel employeeModel, Employee employee) =>
                 {
-                    employee.ID = employeeModel.Id;
-                    employee.DepartmentID = employeeModel.DepartmentId;
+                    employee.Id = employeeModel.Id;
+                    employee.DepartmentId = employeeModel.DepartmentId;
                 });
 
             A.CallTo(() => _queryableDbProvider.Set<Employee>()).Returns(_employees.AsQueryable());
@@ -166,8 +166,8 @@ namespace EmployeeManagement.Domain.Tests.Services
 
             A.CallTo(() => _updateDbProvider.Update(A<Employee>.Ignored)).Invokes((Employee employee) =>
             {
-                var entity = _employees.FirstOrDefault(x => x.ID == employee.ID);
-                if (entity != null) entity.DepartmentID = employee.DepartmentID;
+                var entity = _employees.FirstOrDefault(x => x.Id == employee.Id);
+                if (entity != null) entity.DepartmentId = employee.DepartmentId;
             });
         }
     }

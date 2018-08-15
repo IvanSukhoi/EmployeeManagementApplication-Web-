@@ -1,9 +1,8 @@
 ﻿using System;
 using EmployeeManagement.DataEF.DAL;
-using EmployeeManagement.DataEF.Entities;
 using EmployeeManagement.DataEF.Interfaces;
 
-namespace EmployeeManagement.DataEF.Repositories
+namespace EmployeeManagement.DataEF.DbProviders
 {
     public class UpdateDbProvider : IUpdateDbProvider
     {

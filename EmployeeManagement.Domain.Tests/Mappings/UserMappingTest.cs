@@ -1,6 +1,8 @@
 ﻿using EmployeeManagement.DataEF;
+using EmployeeManagement.DataEF.Entities;
 using EmployeeManagement.Domain.Models;
 using EmployeeManagement.WebUI.Mappings;
+using EmployeeManagement.WebUI.Mappings.MapperWrapper;
 using Xunit;
 
 namespace EmployeeManagement.Domain.Tests.Mappings
@@ -59,14 +61,14 @@ namespace EmployeeManagement.Domain.Tests.Mappings
         {
             Assert.Equal(user.Login, userModel.Login);
             Assert.Equal(user.Password, userModel.Password);
-            Assert.Equal(user.ID, userModel.Id);
+            Assert.Equal(user.Id, userModel.Id);
         }
 
         private void Init()
         {
             _user = new User
             {
-                ID = 1,
+                Id = 1,
                 Login = "Login1",
                 Password = "Password1",
             };

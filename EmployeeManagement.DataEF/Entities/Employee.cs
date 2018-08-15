@@ -7,14 +7,15 @@ namespace EmployeeManagement.DataEF.Entities
     [Table("Employee")]
     public class Employee
     {
-        public int DepartmentID { get; set; }
+        [ForeignKey(nameof(Department))]
+        public int DepartmentId { get; set; }
 
         [Required]
         [StringLength(50)]
         public string FirstName { get; set; }
 
         [StringLength(50)]
-        public string MidleName { get; set; }
+        public string MiddleName { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -26,9 +27,10 @@ namespace EmployeeManagement.DataEF.Entities
 
         public Sex Sex { get; set; }
 
-        public int? ManagerID { get; set; }
+        public int? ManagerId { get; set; }
 
-        public int ID { get; set; }
+        [Key, Required]
+        public int Id { get; set; }
 
         public virtual Department Department { get; set; }
     }

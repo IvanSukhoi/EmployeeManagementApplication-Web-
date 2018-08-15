@@ -68,7 +68,7 @@ namespace EmployeeManagement.Domain.Tests.Services
             _departmentService.Create(departmentModel);
 
             Assert.Equal(4, _departments.Count);
-            Assert.Equal(4, _departments.Last().ID);
+            Assert.Equal(4, _departments.Last().Id);
             Assert.Equal("DepartmentName4", _departments.Last().Name);
         }
 
@@ -92,17 +92,17 @@ namespace EmployeeManagement.Domain.Tests.Services
             {
                 new Department
                 {
-                    ID = 1,
+                    Id = 1,
                     Name = "DepartmentName1"
                 },
                 new Department
                 {
-                    ID = 2,
+                    Id = 2,
                     Name = "DepartmentName2"
                 },
                 new Department
                 {
-                    ID = 3,
+                    Id = 3,
                     Name = "DepartmentName3"
                 }
             };
@@ -111,7 +111,7 @@ namespace EmployeeManagement.Domain.Tests.Services
                 .ReturnsLazily(
                     (Department department) => new DepartmentModel
                     {
-                        Id = department.ID,
+                        Id = department.Id,
                         Name = department.Name
                     });
 
@@ -133,14 +133,14 @@ namespace EmployeeManagement.Domain.Tests.Services
             A.CallTo(() => _mapperWrapper.Map<DepartmentModel, Department>(A<DepartmentModel>.Ignored))
                 .ReturnsLazily((DepartmentModel departmentModel) => new Department
                 {
-                    ID = departmentModel.Id,
+                    Id = departmentModel.Id,
                     Name = departmentModel.Name
                 });
 
             A.CallTo(() => _mapperWrapper.Map(A<DepartmentModel>.Ignored, A<Department>.Ignored)).Invokes(
                 (DepartmentModel employeeModel, Department employee) =>
                 {
-                    employee.ID = employeeModel.Id;
+                    employee.Id = employeeModel.Id;
                     employee.Name = employeeModel.Name;
                 });
 
@@ -156,7 +156,7 @@ namespace EmployeeManagement.Domain.Tests.Services
 
             A.CallTo(() => _updateDbProvider.Update(A<Department>.Ignored)).Invokes((Department department) =>
             {
-                var entity = _departments.FirstOrDefault(x => x.ID == department.ID);
+                var entity = _departments.FirstOrDefault(x => x.Id == department.Id);
                 if (entity != null) entity.Name = department.Name;
             });
         }

@@ -3,11 +3,17 @@ using System.Linq;
 using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Mappings;
 using EmployeeManagement.Domain.Models;
+using EmployeeManagement.WebUI.Areas.API.Filters;
 using EmployeeManagement.WebUI.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagement.WebUI.Areas.API.Controllers
 {
+    [Authorize]
+    [Produces("application/json")]
+    [Route("department")]
+    [LoggingFilter]
     public class DepartmentController : Controller
     {
         private readonly IDepartmentService _departmentService;
@@ -20,7 +26,6 @@ namespace EmployeeManagement.WebUI.Areas.API.Controllers
         }
 
         [HttpGet]
-        [Route("/department")]
         public List<DepartmentViewModel> GetAll()
         {
             var departmentModels = _departmentService.GetAll().Select(x =>  _mapperWrapper.Map<DepartmentModel, DepartmentViewModel>(x)).ToList();
@@ -28,8 +33,7 @@ namespace EmployeeManagement.WebUI.Areas.API.Controllers
             return departmentModels;
         }
 
-        [HttpGet]
-        [Route("/department/{id}")]
+        [HttpGet("{id}")]
         public DepartmentViewModel GetById(int id)
         {
             return _mapperWrapper.Map<DepartmentModel, DepartmentViewModel>(_departmentService.GetById(id));

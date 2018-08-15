@@ -31,28 +31,28 @@ namespace EmployeeManagement.Domain.Services
 
         public void Delete(int id)
         {
-            var dbEntry = _queryableDbProvider.Set<Department>().FirstOrDefault(x => x.ID == id);
+            var dbEntry = _queryableDbProvider.Set<Department>().Include(x => x.Employees).FirstOrDefault(x => x.Id == id);
 
             _updateDbProvider.Delete(dbEntry);
         }
 
         public DepartmentModel GetById(int id)
         {
-            var department = _queryableDbProvider.Set<Department>().Include("Employees").FirstOrDefault(x => x.ID == id);
+            var department = _queryableDbProvider.Set<Department>().Include(x => x.Employees).FirstOrDefault(x => x.Id == id);
 
             return _mapperWrapper.Map<Department, DepartmentModel>(department);
         }
 
         public List<DepartmentModel> GetAll()
         {
-            var departments = _queryableDbProvider.Set<Department>().Include("Employees").ToList();
+            var departments = _queryableDbProvider.Set<Department>().Include(x => x.Employees).ToList();
 
             return _mapperWrapper.Map<List<Department>, List<DepartmentModel>>(departments).ToList();
         }
 
         public void Save(DepartmentModel departmentModel)
         {
-            var dbEntry = _queryableDbProvider.Set<Department>().FirstOrDefault(x => x.ID == departmentModel.Id);
+            var dbEntry = _queryableDbProvider.Set<Department>().Include(x => x.Employees).FirstOrDefault(x => x.Id == departmentModel.Id);
 
             _mapperWrapper.Map(departmentModel, dbEntry);
             _updateDbProvider.Update(dbEntry);

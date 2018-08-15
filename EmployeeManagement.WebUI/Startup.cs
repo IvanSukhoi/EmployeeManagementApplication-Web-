@@ -1,62 +1,139 @@
-﻿using EmployeeManagement.DataEF.DAL;
+﻿using System;
+using System.Text;
+using ElmahCore;
+using EmployeeManagement.DataEF.DAL;
 using EmployeeManagement.DataEF.DbProviders;
+using EmployeeManagement.DataEF.Entities;
 using EmployeeManagement.DataEF.Interfaces;
-using EmployeeManagement.DataEF.Repositories;
+using EmployeeManagement.Domain.Cache;
+using EmployeeManagement.Domain.Identity.Stores;
 using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Mappings;
+using EmployeeManagement.Domain.Models;
 using EmployeeManagement.Domain.Services;
-using EmployeeManagement.WebUI.Mappings;
+using EmployeeManagement.WebUI.Areas.API.Filters;
+using EmployeeManagement.WebUI.Helpers;
+using EmployeeManagement.WebUI.Identity;
+using EmployeeManagement.WebUI.Interfaces;
+using EmployeeManagement.WebUI.JsonWebTokenAuthentication;
+using EmployeeManagement.WebUI.Mappings.MapperWrapper;
+using EmployeeManagement.WebUI.NLog;
+using EmployeeManagement.WebUI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace EmployeeManagement.WebUI
 {
     public class Startup
     {
+        private readonly IConfiguration _configuration;
+        private ValidationHelper _validationHelper;
+
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
-
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<IISOptions>(options =>
-            {
-                options.ForwardClientCertificate = false;
-            });
-
             services.AddDbContext<ManagementContext>();
 
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IEmployeeService, EmployeeService>();
             services.AddScoped<ISettingsService, SettingsService>();
-            services.AddScoped<IUserService, UserService>();
+
             services.AddSingleton<IMapperWrapper, MapperWrapper>();
+
+            services.AddScoped<ICacheManager, CacheManager>();
+            services.AddScoped<IUserCacheManager, UserCacheManager>();
 
             services.AddScoped<IQueryableDbProvider, QueryableDbProvider>();
             services.AddScoped<IUpdateDbProvider, UpdateDbProvider>();
 
+            services.AddSingleton<ILoggerManager, LoggerManager>();
+
+            services.AddIdentity<UserModel, UserRole>()
+                .AddUserManager<UserManager>()
+                .AddSignInManager<SignInManager>()
+                .AddDefaultTokenProviders();
+
+            services.AddTransient<UserStore>();
+            services.AddTransient<IRoleStore<UserRole>, RoleStore>();
+
+            ConfigureJwtAuthServer(services);
+
             services.AddMvc();
+
+            services.AddElmah(options => options.Path = "/elmah");
+            services.AddElmah(x => x.)
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMvc( /*routes =>
+            app.UseElmah();
+
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+
+            app.UseAuthentication();
+            app.UseMvc();
+        }
+
+        public void ConfigureJwtAuthServer(IServiceCollection services)
+        {
+            services.AddScoped<IAccountSevice, AccountService>();
+            services.AddScoped<IAuthorizationService, AuthorizationService>();
+
+            services.AddScoped<JsonWebTokenHandler>();
+
+            var tokenValidationParameters = new TokenValidationParameters
             {
-                  routes.MapRoute("default", "{controller=Employee}/{action=GetAll}");
-                  routes.MapRoute("", "api/{controller=Employee}/{action}/{id?}");
-            }*/);
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = _configuration["jwt:issuer"],
+                ValidAudience = _configuration["jwt:audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["securityKey"])),
+                ClockSkew = TimeSpan.Zero,
+            };
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                _validationHelper = new ValidationHelper();
+                options.Events = new JwtBearerEvents
+                {
+                    OnTokenValidated = _validationHelper.ValidationSecurityStamp
+                };
+                options.TokenValidationParameters = tokenValidationParameters;
+            });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin",
+                    policy => policy.RequireClaim("Admin"));
+            });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("User",
+                    policy => policy.RequireClaim("User"));
+            });
         }
     }
 }

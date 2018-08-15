@@ -4,11 +4,12 @@ using EmployeeManagement.DataEF.Enums;
 
 namespace EmployeeManagement.DataEF.Entities
 {
+    [Table("Settings")]
     public class Settings
     {
         [Key, Required]
         [ForeignKey(nameof(User))]
-        public int UserID { get; set; }
+        public int UserId { get; set; }
 
         public Theme Topic { get; set; }
 

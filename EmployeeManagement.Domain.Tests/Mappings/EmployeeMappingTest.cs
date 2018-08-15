@@ -3,6 +3,7 @@ using EmployeeManagement.DataEF.Entities;
 using EmployeeManagement.DataEF.Enums;
 using EmployeeManagement.Domain.Models;
 using EmployeeManagement.WebUI.Mappings;
+using EmployeeManagement.WebUI.Mappings.MapperWrapper;
 using Xunit;
 
 namespace EmployeeManagement.Domain.Tests.Mappings
@@ -64,12 +65,12 @@ namespace EmployeeManagement.Domain.Tests.Mappings
 
         private void AssertPropertyValue(Employee employee, EmployeeModel employeeModel)
         {
-            Assert.Equal(employee.ID, employeeModel.Id);
+            Assert.Equal(employee.Id, employeeModel.Id);
             Assert.Equal(employee.FirstName, employeeModel.FirstName);
-            Assert.Equal(employee.MidleName, employeeModel.MiddleName);
+            Assert.Equal(employee.MiddleName, employeeModel.MiddleName);
             Assert.Equal(employee.LastName, employeeModel.LastName);
-            Assert.Equal(employee.DepartmentID, employeeModel.DepartmentId);
-            Assert.Equal(employee.ManagerID, employeeModel.ManagerId);
+            Assert.Equal(employee.DepartmentId, employeeModel.DepartmentId);
+            Assert.Equal(employee.ManagerId, employeeModel.ManagerId);
             Assert.Equal(employee.Position, employeeModel.Position);
             Assert.Equal(employee.Profession, employeeModel.Profession);
             Assert.Equal(employee.Sex, employeeModel.Sex);
@@ -79,18 +80,18 @@ namespace EmployeeManagement.Domain.Tests.Mappings
         {
             _employee = new Employee
             {
-                ID = 4,
+                Id = 4,
                 FirstName = "FirstName4",
-                MidleName = "MiddleName4",
+                MiddleName = "MiddleName4",
                 LastName = "LastName4",
-                DepartmentID = 4,
-                ManagerID= 4,
+                DepartmentId = 4,
+                ManagerId= 4,
                 Position = Position.Intern,
                 Profession = Profession.Developer,
                 Sex = Sex.Female,
                 Department = new Department
                 {
-                    ID = 4,
+                    Id = 4,
                     Name = "DepartmentName3"
                 }
             };

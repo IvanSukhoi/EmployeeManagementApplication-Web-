@@ -11,6 +11,7 @@ namespace EmployeeManagement.Domain.Mappings
             config.AddProfile<EmployeeMappingProfile>();
             config.AddProfile<SettingsMappingProfile>();
             config.AddProfile<UserMappingProfile>();
+            config.AddProfile<TokenMappingProfile>();
         }
     }
 }

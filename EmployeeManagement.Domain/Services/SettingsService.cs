@@ -23,14 +23,14 @@ namespace EmployeeManagement.Domain.Services
 
         public SettingsModel GetByUserId(int id)
         {
-            var settings = _queryableDbProvider.Set<Settings>().Include("Users").FirstOrDefault(x => x.UserID == id);
+            var settings = _queryableDbProvider.Set<Settings>().Include(x => x.User).FirstOrDefault(x => x.UserId == id);
 
             return _mapperWrapper.Map<Settings, SettingsModel>(settings);
         }
 
         public void Save(SettingsModel settingsModel)
         {
-            var dbEntry = _queryableDbProvider.Set<Settings>().FirstOrDefault(x => x.UserID == settingsModel.UserId);
+            var dbEntry = _queryableDbProvider.Set<Settings>().FirstOrDefault(x => x.UserId == settingsModel.UserId);
 
             _mapperWrapper.Map(settingsModel, dbEntry);
 

@@ -1,6 +1,7 @@
 ﻿using EmployeeManagement.DataEF.Entities;
 using EmployeeManagement.Domain.Models;
 using EmployeeManagement.WebUI.Mappings;
+using EmployeeManagement.WebUI.Mappings.MapperWrapper;
 using Xunit;
 
 namespace EmployeeManagement.Domain.Tests.Mappings
@@ -56,7 +57,7 @@ namespace EmployeeManagement.Domain.Tests.Mappings
 
         private void AssertPropertyValue(Department department, DepartmentModel departmentModel)
         {
-            Assert.Equal(department.ID, departmentModel.Id);
+            Assert.Equal(department.Id, departmentModel.Id);
             Assert.Equal(department.Name, departmentModel.Name);
         }
 
@@ -64,7 +65,7 @@ namespace EmployeeManagement.Domain.Tests.Mappings
         {
             _department = new Department
             {
-                ID = 1,
+                Id = 1,
                 Name = "DepartmentName1"
             };
 

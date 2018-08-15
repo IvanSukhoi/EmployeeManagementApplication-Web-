@@ -58,17 +58,17 @@ namespace EmployeeManagement.Domain.Tests.Services
             {
                 new Settings
                 {
-                    UserID = 1,
+                    UserId = 1,
                     Language = Language.English
                 },
                 new Settings
                 {
-                    UserID = 2,
+                    UserId = 2,
                     Language = Language.Russian
                 },
                 new Settings
                 {
-                    UserID = 3,
+                    UserId = 3,
                     Language = Language.English
                 }
             };
@@ -76,14 +76,14 @@ namespace EmployeeManagement.Domain.Tests.Services
             A.CallTo(() => _mapperWrapper.Map<Settings, SettingsModel>(A<Settings>.That.Matches(x => x != null))).ReturnsLazily(
                 (Settings settings) => new SettingsModel()
                 {
-                    UserId = settings.UserID,
+                    UserId = settings.UserId,
                     Language = settings.Language
                 });
 
             A.CallTo(() => _mapperWrapper.Map(A<SettingsModel>.Ignored, A<Settings>.Ignored)).Invokes(
                 (SettingsModel settingsModel, Settings settings) =>
                 {
-                    settings.UserID = settingsModel.UserId;
+                    settings.UserId = settingsModel.UserId;
                     settings.Language = settingsModel.Language;
                 });
 
@@ -91,7 +91,7 @@ namespace EmployeeManagement.Domain.Tests.Services
 
             A.CallTo(() => _updateDbProvider.Update(A<Settings>.Ignored)).Invokes((Settings settings) =>
             {
-                var entity = _settings.FirstOrDefault(x => x.UserID == settings.UserID);
+                var entity = _settings.FirstOrDefault(x => x.UserId == settings.UserId);
                 if (entity != null) entity.Language = settings.Language;
             });
         }
