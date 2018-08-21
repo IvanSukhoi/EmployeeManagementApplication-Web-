@@ -17,7 +17,7 @@ namespace EmployeeManagement.DataEF.Entities
 
         [Required]
         [StringLength(100)]
-        public string Password { get; set; }
+        public string PasswordHash { get; set; }
 
         public string SecurityStamp { get; set; }
         public virtual Settings Settings { get; set; }

@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace EmployeeManagement.WebUI.Helpers
 {
-    public class ValidationHelper
+    public class TokenValidationHelper
     {
         private UserSettingsModel _userSettingsModel;
 
@@ -21,7 +21,7 @@ namespace EmployeeManagement.WebUI.Helpers
                 var result = await signInManager.ValidateSecurityStampAsync(context.Principal);
 
                 if (result == null)
-                {
+                {  
                     context.HttpContext.Response.StatusCode = 401;
                     context.Fail("The claim security stamp is not present in the token");
                 }

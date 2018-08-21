@@ -5,7 +5,7 @@ namespace EmployeeManagement.WebUI.Interfaces
 {
     public interface IAccountSevice
     {
-        Task<UserModel> GetUserModelByRefreshTokenAsync(string token);
-        Task<UserModel> GetUserModelAsync(string login, string password);
+        Task<UserModel> GetUserByIdAsync(string token);
+        Task<UserModel> GetUserByLoginAsync(string token);
     }
 }

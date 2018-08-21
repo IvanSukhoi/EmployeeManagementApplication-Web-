@@ -4,15 +4,16 @@ using EmployeeManagement.Domain.Mappings;
 using EmployeeManagement.Domain.Models;
 using EmployeeManagement.WebUI.Areas.API.Filters;
 using EmployeeManagement.WebUI.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagement.WebUI.Areas.API.Controllers
 {
-    [Authorize]
     [Produces("application/json")]
     [Route("employee")]
     [LoggingFilter]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeService _employeeService;

@@ -11,6 +11,7 @@ using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Mappings;
 using EmployeeManagement.Domain.Models;
 using EmployeeManagement.Domain.Services;
+using EmployeeManagement.WebUI.Areas.API.Filters;
 using EmployeeManagement.WebUI.Helpers;
 using EmployeeManagement.WebUI.Identity;
 using EmployeeManagement.WebUI.Interfaces;
@@ -34,7 +35,7 @@ namespace EmployeeManagement.WebUI
     public class Startup
     {
         private readonly IConfiguration _configuration;
-        private ValidationHelper _validationHelper;
+        private TokenValidationHelper _tokenValidationHelper;
 
         public Startup(IConfiguration configuration)
         {
@@ -68,13 +69,16 @@ namespace EmployeeManagement.WebUI
             services.AddTransient<IRoleStore<UserRole>, RoleStore>();
 
             ConfigureJwtAuthServer(services);
+            ConfigureCoockieAuthServer(services);
 
-            services.AddMvc();
+            services.AddMvc(options => { options.Filters.Add<LoggingFilterAttribute>(); });
 
             services.AddElmah(options =>
             {
                 options.Path = "/elmah";
             });
+
+            AddPolicy(services);
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -90,7 +94,7 @@ namespace EmployeeManagement.WebUI
             app.MapWhen(context =>
             {
                 if (!context.Request.GetUri().ToString().EndsWith("/elmah")) return false;
-                var role = context.User.Claims.SingleOrDefault(x => x.Type == "Admin")?.Value;
+                var role = context.User.Claims.SingleOrDefault(x => x.Type == "Admin");
 
                 return role == null;
 
@@ -105,7 +109,7 @@ namespace EmployeeManagement.WebUI
             app.Run(async context => { await context.Response.WriteAsync("Invalid access"); });
         }
 
-        public void ConfigureJwtAuthServer(IServiceCollection services)
+        private void ConfigureJwtAuthServer(IServiceCollection services)
         {
             services.AddScoped<IAccountSevice, AccountService>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
@@ -124,20 +128,37 @@ namespace EmployeeManagement.WebUI
                 ClockSkew = TimeSpan.Zero,
             };
 
-            services.AddAuthentication(options =>
+            services.AddAuthentication().AddJwtBearer(options =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
-                _validationHelper = new ValidationHelper();
+                _tokenValidationHelper = new TokenValidationHelper();
                 options.Events = new JwtBearerEvents
                 {
-                    OnTokenValidated = _validationHelper.ValidationSecurityStamp
+                    OnTokenValidated = _tokenValidationHelper.ValidationSecurityStamp
                 };
                 options.TokenValidationParameters = tokenValidationParameters;
             });
+        }
 
+        private void ConfigureCoockieAuthServer(IServiceCollection services)
+        {
+            services.AddScoped<ISecurityStampValidator, Helpers.SecurityStampValidator>();
+
+            services.Configure<SecurityStampValidatorOptions>(options =>
+            {
+                options.ValidationInterval = TimeSpan.FromSeconds(10);
+            });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = new PathString("/coockie/login");
+                options.AccessDeniedPath = new PathString("/coockie/login");
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+                options.SlidingExpiration = true;
+            });
+        }
+
+        private void AddPolicy(IServiceCollection services)
+        {
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("Admin",

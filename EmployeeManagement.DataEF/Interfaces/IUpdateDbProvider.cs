@@ -1,4 +1,6 @@
-﻿namespace EmployeeManagement.DataEF.Interfaces
+﻿using System.Threading.Tasks;
+
+namespace EmployeeManagement.DataEF.Interfaces
 {
     public interface IUpdateDbProvider
     {

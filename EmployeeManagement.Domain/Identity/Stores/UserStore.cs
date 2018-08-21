@@ -13,7 +13,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManagement.Domain.Identity.Stores
 {
-    public class UserStore : IUserRoleStore<UserModel>, IUserTokenStore, IUserSecurityStampStore<UserModel>
+    public class UserStore : IUserRoleStore<UserModel>, IUserTokenStore, IUserSecurityStampStore<UserModel>, IUserPasswordStore<UserModel>
     {
         private readonly IQueryableDbProvider _queryableDbProvider;
         private readonly IUpdateDbProvider _updateDbProvider;
@@ -100,44 +100,46 @@ namespace EmployeeManagement.Domain.Identity.Stores
         public Task SetSecurityStampAsync(UserModel user, string stamp, CancellationToken cancellationToken)
         {
             user.SecurityStamp = stamp;
-            _updateDbProvider.Update(_mapperWrapper.Map<UserModel, User>(user));
 
             return Task.CompletedTask;
         }
 
-        public async Task<string> GetSecurityStampAsync(UserModel user, CancellationToken cancellationToken)
+        public Task<string> GetSecurityStampAsync(UserModel user, CancellationToken cancellationToken)
         {
-            var dbEntry = await _queryableDbProvider.Set<User>().FirstOrDefaultAsync(x => x.Id == user.Id, cancellationToken: cancellationToken);
-
-            return dbEntry.SecurityStamp;
+            return Task.FromResult(user.SecurityStamp);
         }
         public Task<string> GetUserIdAsync(UserModel user, CancellationToken cancellationToken)
         {
             return Task.FromResult(user.Id.ToString());
         }
 
-        public void Dispose()
-        { }
-
         public Task<string> GetUserNameAsync(UserModel user, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task SetUserNameAsync(UserModel user, string userName, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<string> GetNormalizedUserNameAsync(UserModel user, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
+            return Task.FromResult(user.Login);
         }
 
         public Task SetNormalizedUserNameAsync(UserModel user, string normalizedName, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return Task.CompletedTask;
         }
+
+        public Task SetPasswordHashAsync(UserModel user, string passwordHash, CancellationToken cancellationToken)
+        {
+            user.PasswordHash = passwordHash;
+
+            return Task.CompletedTask;
+        }
+
+        public Task<string> GetPasswordHashAsync(UserModel user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.PasswordHash);
+        }
+
+        public Task<bool> HasPasswordAsync(UserModel user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.PasswordHash != null);
+        }
+
         public Task AddToRoleAsync(UserModel user, string roleName, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
@@ -156,5 +158,17 @@ namespace EmployeeManagement.Domain.Identity.Stores
         {
             throw new NotImplementedException();
         }
+
+        public Task SetUserNameAsync(UserModel user, string userName, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+        public Task<string> GetNormalizedUserNameAsync(UserModel user, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        { }
     }
 }

@@ -12,7 +12,7 @@ namespace EmployeeManagement.WebUI.Areas.API.Filters
 
         public void OnActionExecuting(ActionExecutingContext context)
         {
-            var userId = context.HttpContext.User.Claims.SingleOrDefault(x => x.Type == "userId")?.Value;
+            var userId = context.HttpContext.User.Claims.SingleOrDefault(x => x.Type == "userId")?.Value ?? "Anonymous";
 
             _logger.Info("Request:" + Environment.NewLine + 
                          "Method: " + context.HttpContext.Request.Method + Environment.NewLine +

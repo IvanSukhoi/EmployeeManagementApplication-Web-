@@ -3,17 +3,16 @@ using System.Linq;
 using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Mappings;
 using EmployeeManagement.Domain.Models;
-using EmployeeManagement.WebUI.Areas.API.Filters;
 using EmployeeManagement.WebUI.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagement.WebUI.Areas.API.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Produces("application/json")]
     [Route("department")]
-    [LoggingFilter]
     public class DepartmentController : Controller
     {
         private readonly IDepartmentService _departmentService;

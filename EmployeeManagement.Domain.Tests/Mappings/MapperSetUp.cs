@@ -1,5 +1,4 @@
-﻿using EmployeeManagement.WebUI.Mappings;
-using EmployeeManagement.WebUI.Mappings.MapperWrapper;
+﻿using EmployeeManagement.WebUI.Mappings.MapperWrapper;
 
 namespace EmployeeManagement.Domain.Tests.Mappings
 {

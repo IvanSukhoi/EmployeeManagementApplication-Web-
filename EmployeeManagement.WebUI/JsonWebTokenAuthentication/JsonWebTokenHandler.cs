@@ -72,13 +72,13 @@ namespace EmployeeManagement.WebUI.JsonWebTokenAuthentication
             return signingCredentials;
         }
 
-        public string GetUserIdByRefreshToken(string token)
+        public string GetUserClaimByRefreshToken(string token, string claimName)
         {
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
 
             if (jwtSecurityTokenHandler.ReadToken(token) is JwtSecurityToken jwtSecurityToken)
             {
-                var userIdClaim = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == "userId");
+                var userIdClaim = jwtSecurityToken.Claims.FirstOrDefault(x => x.Type == claimName);
 
                 if (userIdClaim != null) return userIdClaim.Value;
             }

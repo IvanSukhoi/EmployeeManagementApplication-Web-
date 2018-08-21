@@ -17,22 +17,15 @@ namespace EmployeeManagement.WebUI.Services
             _jsonWebTokenHandler = jsonWebTokenHandler;
             _userManager = userManager;
         }
-
-        public async Task<UserModel> GetUserModelByRefreshTokenAsync(string token)
+        
+        public async Task<UserModel> GetUserByIdAsync(string token)
         {
-            return await _userManager.FindByIdAsync(_jsonWebTokenHandler.GetUserIdByRefreshToken(token));
+            return await _userManager.FindByIdAsync(_jsonWebTokenHandler.GetUserClaimByRefreshToken(token, "userId"));
         }
 
-        public async Task<UserModel> GetUserModelAsync(string login, string password)
+        public async Task<UserModel> GetUserByLoginAsync(string token)
         {
-            var userModel = await _userManager.FindByNameAsync(login);
-
-            if (userModel.Password.Contains(password))
-            {
-                return userModel;
-            }
-
-            throw new InvalidOperationException("Incorrect password");
+            return await _userManager.FindByNameAsync(_jsonWebTokenHandler.GetUserClaimByRefreshToken(token, "login"));
         }
     }
 }

@@ -1,5 +1,4 @@
 using EmployeeManagement.DataEF.Entities;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeManagement.DataEF.DAL

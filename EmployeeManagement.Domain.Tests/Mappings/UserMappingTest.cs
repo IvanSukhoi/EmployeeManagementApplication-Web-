@@ -1,7 +1,5 @@
-﻿using EmployeeManagement.DataEF;
-using EmployeeManagement.DataEF.Entities;
+﻿using EmployeeManagement.DataEF.Entities;
 using EmployeeManagement.Domain.Models;
-using EmployeeManagement.WebUI.Mappings;
 using EmployeeManagement.WebUI.Mappings.MapperWrapper;
 using Xunit;
 
@@ -60,7 +58,7 @@ namespace EmployeeManagement.Domain.Tests.Mappings
         private void AssertPropertyValue(User user, UserModel userModel)
         {
             Assert.Equal(user.Login, userModel.Login);
-            Assert.Equal(user.Password, userModel.Password);
+            Assert.Equal(user.PasswordHash, userModel.PasswordHash);
             Assert.Equal(user.Id, userModel.Id);
         }
 
@@ -70,14 +68,14 @@ namespace EmployeeManagement.Domain.Tests.Mappings
             {
                 Id = 1,
                 Login = "Login1",
-                Password = "Password1",
+                PasswordHash = "Password1",
             };
 
             _userModel = new UserModel
             {
                 Id = 2,
                 Login = "Login2",
-                Password = "Password2"
+                PasswordHash = "Password2"
             };
         }
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using EmployeeManagement.DataEF.DAL;
 using EmployeeManagement.DataEF.Interfaces;
 

@@ -1,6 +1,6 @@
 ﻿using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Models;
-using EmployeeManagement.WebUI.Areas.API.Filters;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +9,7 @@ namespace EmployeeManagement.WebUI.Areas.API.Controllers
     [Authorize]
     [Produces("application/json")]
     [Route("settings")]
-    [LoggingFilter]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class SettingsController : Controller
     {
         private readonly ISettingsService _settingsService;

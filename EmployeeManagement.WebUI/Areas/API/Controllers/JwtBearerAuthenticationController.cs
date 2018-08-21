@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using EmployeeManagement.Domain.Models;
 using EmployeeManagement.WebUI.Identity;
+using EmployeeManagement.WebUI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,16 +12,16 @@ namespace EmployeeManagement.WebUI.Areas.API.Controllers
 {
     [Authorize]
     [Produces("application/json")]
-    [Route("authorize")]
-    public class AuthorizationController : Controller
+    [Route("jwt")]
+    public class JwtBearerAuthenticationController : Controller
     {
         private readonly UserManager _userManager;
         private readonly SignInManager _signInManager;
         private readonly IAuthorizationService _authorizationService;
-        private readonly ILogger<AuthorizationController> _logger;
+        private readonly ILogger<JwtBearerAuthenticationController> _logger;
 
-        public AuthorizationController(UserManager userManager, SignInManager signInManager,
-            IAuthorizationService authorizationService, ILogger<AuthorizationController> logger)
+        public JwtBearerAuthenticationController(UserManager userManager, SignInManager signInManager,
+            IAuthorizationService authorizationService, ILogger<JwtBearerAuthenticationController> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -28,19 +29,19 @@ namespace EmployeeManagement.WebUI.Areas.API.Controllers
             _logger = logger;
         }
 
-        [HttpPost]
+        [HttpPost("signin")]
         [AllowAnonymous]
-        public async Task<IActionResult> SignInAsync([FromBody] UserModel userModel)
+        public async Task<IActionResult> SignInAsync([FromBody] LoginViewModel model)
         {
-            var user = await _userManager.FindByNameAsync(userModel.Login);
+            var user = await _userManager.FindByNameAsync(model.Login);
 
-            var result = await _signInManager.PasswordSignInAsync(user, userModel.Password, false, false);
+            var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
 
             _logger.LogInformation(Environment.NewLine + "Login attempt" + Environment.NewLine +
                                    "Id: {0}" + Environment.NewLine +
                                    "Login: {1}" + Environment.NewLine + 
                                    "Result: {2}", 
-                userModel.Id, userModel.Login, result);
+                model.Id, model.Login, result);
 
             if (result.Succeeded)
             {

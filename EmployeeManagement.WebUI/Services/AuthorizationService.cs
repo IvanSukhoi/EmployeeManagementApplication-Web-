@@ -25,14 +25,9 @@ namespace EmployeeManagement.WebUI.Services
             return jsonWebToken;
         }
 
-        public async Task<UserModel> GetUserModelByRefreshTokenAsync(string token)
-        {
-            return await _userManager.FindByIdAsync(_jwtHandler.GetUserIdByRefreshToken(token));
-        }
-
         public async Task<JsonWebToken> RefreshAccessTokenAsync(string token)
         {
-            var userId = _jwtHandler.GetUserIdByRefreshToken(token);
+            var userId = _jwtHandler.GetUserClaimByRefreshToken(token, "userId");
 
             var tokenDb = await _userManager.GetTokenByIdAsync(userId);
 

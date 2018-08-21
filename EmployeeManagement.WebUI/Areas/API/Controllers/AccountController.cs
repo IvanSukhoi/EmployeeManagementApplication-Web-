@@ -1,35 +1,39 @@
 ﻿using System.Threading.Tasks;
 using EmployeeManagement.Domain.Models;
-using EmployeeManagement.WebUI.Areas.API.Filters;
 using EmployeeManagement.WebUI.Identity;
 using EmployeeManagement.WebUI.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
 namespace EmployeeManagement.WebUI.Areas.API.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Produces("application/json")]
     [Route("account")]
-    [LoggingFilter]
     public class AccountController : Controller
     {
         private readonly IAccountSevice _accountSevice;
+        private readonly UserManager _userManager;
 
-        public AccountController(IAccountSevice accountSevice)
+        public AccountController(IAccountSevice accountSevice, UserManager userManager)
         {
             _accountSevice = accountSevice;
+            _userManager = userManager;
         }
 
         [HttpPost]
-        public async Task<UserModel> GetUserModel([FromBody] UserModel userModel)
+        public async Task<UserModel> GetUserByLoginAsync(string login)
         {
-            return await _accountSevice.GetUserModelAsync(userModel.Login, userModel.Password);
+            var user = await _userManager.FindByNameAsync(login);
+
+            return user;
         }
 
         [HttpPost("refreshtoken")]
         public async Task<UserModel> GetUserModelByRefreshTokenAsync([FromBody] string refreshToken)
         {
-            return await _accountSevice.GetUserModelByRefreshTokenAsync(refreshToken);
+            return await _accountSevice.GetUserByIdAsync(refreshToken);
         }
     }
 }
