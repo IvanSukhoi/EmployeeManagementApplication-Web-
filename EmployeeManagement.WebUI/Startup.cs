@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using EmployeeManagement.DataEF.DAL;
 using EmployeeManagement.DataEF.DbProviders;
@@ -11,13 +12,11 @@ using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Mappings;
 using EmployeeManagement.Domain.Models;
 using EmployeeManagement.Domain.Services;
-using EmployeeManagement.WebUI.Areas.API.Filters;
 using EmployeeManagement.WebUI.Helpers;
 using EmployeeManagement.WebUI.Identity;
 using EmployeeManagement.WebUI.Interfaces;
 using EmployeeManagement.WebUI.JsonWebTokenAuthentication;
 using EmployeeManagement.WebUI.Mappings.MapperWrapper;
-using EmployeeManagement.WebUI.NLog;
 using EmployeeManagement.WebUI.Services;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -25,10 +24,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using NLog;
 
 namespace EmployeeManagement.WebUI
 {
@@ -44,7 +45,9 @@ namespace EmployeeManagement.WebUI
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ManagementContext>();
+            services.AddDbContext<ManagementContext>(options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddScoped<ClaimsIdentityOptions>();
 
             services.AddScoped<IDepartmentService, DepartmentService>();
             services.AddScoped<IEmployeeService, EmployeeService>();
@@ -58,8 +61,6 @@ namespace EmployeeManagement.WebUI
             services.AddScoped<IQueryableDbProvider, QueryableDbProvider>();
             services.AddScoped<IUpdateDbProvider, UpdateDbProvider>();
 
-            services.AddSingleton<ILoggerManager, LoggerManager>();
-
             services.AddIdentity<UserModel, UserRole>()
                 .AddUserManager<UserManager>()
                 .AddSignInManager<SignInManager>()
@@ -69,9 +70,10 @@ namespace EmployeeManagement.WebUI
             services.AddTransient<IRoleStore<UserRole>, RoleStore>();
 
             ConfigureJwtAuthServer(services);
-            ConfigureCoockieAuthServer(services);
+            //ConfigureCoockieAuthServer(services);
 
-            services.AddMvc(options => { options.Filters.Add<LoggingFilterAttribute>(); });
+            services.AddMvc();
+            //services.AddMvc(options => { options.Filters.Add<LoggingFilterAttribute>(); });
 
             services.AddElmah(options =>
             {
@@ -100,6 +102,10 @@ namespace EmployeeManagement.WebUI
 
             }, Handle);
 
+            GlobalDiagnosticsContext.Set("connectionString", _configuration.GetConnectionString("DefaultConnection"));
+
+            //loggerFactory.AddNLog();
+
             app.UseElmah();
             app.UseMvc();
         }
@@ -111,7 +117,7 @@ namespace EmployeeManagement.WebUI
 
         private void ConfigureJwtAuthServer(IServiceCollection services)
         {
-            services.AddScoped<IAccountSevice, AccountService>();
+            services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IAuthorizationService, AuthorizationService>();
 
             services.AddScoped<JsonWebTokenHandler>();
@@ -126,9 +132,14 @@ namespace EmployeeManagement.WebUI
                 ValidAudience = _configuration["jwt:audience"],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["securityKey"])),
                 ClockSkew = TimeSpan.Zero,
+                
             };
 
-            services.AddAuthentication().AddJwtBearer(options =>
+            services.AddAuthentication(c =>
+            {
+                c.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                c.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
             {
                 _tokenValidationHelper = new TokenValidationHelper();
                 options.Events = new JwtBearerEvents
@@ -162,13 +173,13 @@ namespace EmployeeManagement.WebUI
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("Admin",
-                    policy => policy.RequireClaim("Admin"));
+                    policy => policy.RequireClaim(ClaimTypes.Role));
             });
 
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("User",
-                    policy => policy.RequireClaim("User"));
+                    policy => policy.RequireClaim(ClaimTypes.Role));
             });
         }
     }

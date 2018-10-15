@@ -2,27 +2,26 @@
 using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Mappings;
 using EmployeeManagement.Domain.Models;
-using EmployeeManagement.WebUI.Areas.API.Filters;
+using EmployeeManagement.WebUI.Interfaces;
 using EmployeeManagement.WebUI.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 
 namespace EmployeeManagement.WebUI.Areas.API.Controllers
 {
     [Produces("application/json")]
     [Route("employee")]
-    [LoggingFilter]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeService _employeeService;
         private readonly IMapperWrapper _mapperWrapper;
+        private readonly ILogger<EmployeeController> _logger;
 
-        public EmployeeController(IEmployeeService employeeService, IMapperWrapper mapperWrapper)
+        public EmployeeController(IEmployeeService employeeService, IMapperWrapper mapperWrapper, ILogger<EmployeeController> logger)
         {
             _employeeService = employeeService;
             _mapperWrapper = mapperWrapper;
+            _logger = logger;
         }
 
         [HttpGet("{id}")]
@@ -34,13 +33,26 @@ namespace EmployeeManagement.WebUI.Areas.API.Controllers
         [HttpGet("department/{id}")]
         public List<EmployeeViewModel> GetByDepartmentId(int id)
         {
-            return _mapperWrapper.Map<List<EmployeeModel>, List<EmployeeViewModel>>(_employeeService.GetByDepartmentId(id));
+            _logger.LogInformation("Start method GetByDepartmentId in EmployeeController");
+            var employeeModels = _employeeService.GetByDepartmentId(id);
+
+            _logger.LogInformation("Mapping employeeModel to employee view model");
+            var employeeViewModels = _mapperWrapper.Map<List<EmployeeModel>, List<EmployeeViewModel>>(employeeModels);
+            _logger.LogInformation("Mapping is complete");
+
+            _logger.LogInformation("Method GetByDepartmentId in DepartmentController is complete");
+
+            return employeeViewModels;
         }
 
         [HttpGet]
         public List<EmployeeViewModel> GetAll()
         {
-            return _mapperWrapper.Map<List<EmployeeModel>, List<EmployeeViewModel>>(_employeeService.GetAll());
+            _logger.LogInformation("Start method GetAll in DepartmentController");
+            var employeeViewModels = _mapperWrapper.Map<List<EmployeeModel>, List<EmployeeViewModel>>(_employeeService.GetAll());
+            _logger.LogInformation("GetAll is complete in employee controller");
+
+            return employeeViewModels;
         }
 
         [HttpPost]

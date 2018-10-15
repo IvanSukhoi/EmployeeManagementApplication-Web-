@@ -6,6 +6,7 @@ using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Mappings;
 using EmployeeManagement.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace EmployeeManagement.Domain.Services
 {
@@ -15,11 +16,14 @@ namespace EmployeeManagement.Domain.Services
         private readonly IQueryableDbProvider _queryableDbProvider;
         private readonly IUpdateDbProvider _updateDbProvider;
 
-        public DepartmentService(IMapperWrapper mapperWrapper, IQueryableDbProvider queryableDbProvider, IUpdateDbProvider updateDbProvider)
+        private readonly ILogger<DepartmentService> _logger;
+
+        public DepartmentService(IMapperWrapper mapperWrapper, IQueryableDbProvider queryableDbProvider, IUpdateDbProvider updateDbProvider, ILogger<DepartmentService> logger)
         {
             _mapperWrapper = mapperWrapper;
             _queryableDbProvider = queryableDbProvider;
             _updateDbProvider = updateDbProvider;
+            _logger = logger;
         }
 
         public void Create(DepartmentModel departmentModel)
@@ -45,9 +49,14 @@ namespace EmployeeManagement.Domain.Services
 
         public List<DepartmentModel> GetAll()
         {
+            _logger.LogInformation("Start method GetAll in department service");
             var departments = _queryableDbProvider.Set<Department>().Include(x => x.Employees).ToList();
+            _logger.LogInformation("Map department to department model");
+            var departmentModels = _mapperWrapper.Map<List<Department>, List<DepartmentModel>>(departments).ToList();
+            _logger.LogInformation("Mapping is complete");
+            _logger.LogInformation("Method GetAll in department service is complete");
 
-            return _mapperWrapper.Map<List<Department>, List<DepartmentModel>>(departments).ToList();
+            return departmentModels;
         }
 
         public void Save(DepartmentModel departmentModel)

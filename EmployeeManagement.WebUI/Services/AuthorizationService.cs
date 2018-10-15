@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using EmployeeManagement.Domain.Models;
 using EmployeeManagement.WebUI.Identity;
@@ -11,11 +13,13 @@ namespace EmployeeManagement.WebUI.Services
     {
         private readonly JsonWebTokenHandler _jwtHandler;
         private readonly UserManager _userManager;
+        private readonly SignInManager _signInManager;
 
-        public AuthorizationService(UserManager userManager, JsonWebTokenHandler jwtHandler)
+        public AuthorizationService(UserManager userManager, JsonWebTokenHandler jwtHandler, SignInManager signInManager)
         {
             _userManager = userManager;
             _jwtHandler = jwtHandler;
+            _signInManager = signInManager;
         }
 
         public async Task<JsonWebToken> SignInAsync(UserModel userModel)
@@ -27,7 +31,7 @@ namespace EmployeeManagement.WebUI.Services
 
         public async Task<JsonWebToken> RefreshAccessTokenAsync(string token)
         {
-            var userId = _jwtHandler.GetUserClaimByRefreshToken(token, "userId");
+            var userId = _jwtHandler.GetUserClaimByRefreshToken(token, ClaimTypes.NameIdentifier);
 
             var tokenDb = await _userManager.GetTokenByIdAsync(userId);
 
@@ -43,9 +47,9 @@ namespace EmployeeManagement.WebUI.Services
 
         private async Task<JsonWebToken> GenerateJSonWebToken(UserModel userModel)
         {
-            var roles = await _userManager.GetRolesAsync(userModel);
+            var claimsPrincipal = await _signInManager.ClaimsFactory.CreateAsync(userModel);
 
-            var jSonWebToken = _jwtHandler.CreateJsonWebToken(roles, userModel.Login, userModel.Id, userModel.SecurityStamp);
+            var jSonWebToken = _jwtHandler.CreateJsonWebToken(claimsPrincipal.Claims.ToList());
 
             await _userManager.SetTokenAsync(new TokenModel
             {

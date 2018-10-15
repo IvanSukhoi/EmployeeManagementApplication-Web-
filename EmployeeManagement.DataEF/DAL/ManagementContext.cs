@@ -5,9 +5,8 @@ namespace EmployeeManagement.DataEF.DAL
 {
     public class ManagementContext : DbContext
     {
-        public ManagementContext() : base()
-        {
-        }
+        public ManagementContext(DbContextOptions options) : base(options)
+        {}
 
         public virtual DbSet<Department> Departments { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
@@ -18,8 +17,6 @@ namespace EmployeeManagement.DataEF.DAL
         public virtual DbSet<Token> Token { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Data Source=.;Initial Catalog=EmployeeManagmentApp;Integrated Security=True");
-        }
+        {}
     }
 }

@@ -15,6 +15,11 @@ namespace EmployeeManagement.WebUI.Helpers
         {
             SetSettingsUserModel(context);
 
+            if (_userSettingsModel == null)
+            {
+                _userSettingsModel = new UserSettingsModel();
+            }
+
             if (DateTime.UtcNow.CompareTo(_userSettingsModel.PreviousValidationTime.AddMinutes(10)) >= 0)
             {
                 var signInManager = context.HttpContext.RequestServices.GetService<SignInManager>();
@@ -27,10 +32,9 @@ namespace EmployeeManagement.WebUI.Helpers
                 }
                 else
                 {
+                    _userSettingsModel.PreviousValidationTime = DateTime.UtcNow;
                     context.Success();
                 }
-
-                _userSettingsModel.PreviousValidationTime = DateTime.UtcNow;
             }
             else
             {

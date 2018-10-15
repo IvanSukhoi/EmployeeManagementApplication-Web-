@@ -1,0 +1,11 @@
+version: '3.0'
+ 
+services:
+   employeemanagementapp:
+     environment:
+      - ASPNETCORE_ENVIRONMENT=Staging
+     image: test/employeemanagementapp
+     build:
+       context: .
+     ports:
+       - "8080:80"

@@ -18,25 +18,20 @@ namespace EmployeeManagement.WebUI.JsonWebTokenAuthentication
             _configuration = configuration;
         }
 
-        public JsonWebToken CreateJsonWebToken(IList<string> roles, string login, int id, string securityStamp)
+        public JsonWebToken CreateJsonWebToken(IList<Claim> claims)
         {
             var jSonWebToken = new JsonWebToken
             {
-                AccessToken = CreateAccessToken(roles, login, id, securityStamp),
-                RefreshToken = CreateRefreshToken(id),
+                AccessToken = CreateAccessToken(claims),
+                RefreshToken = CreateRefreshToken(claims),
                 Expires = DateTime.UtcNow.AddMinutes(double.Parse(_configuration["expires:expiryMinutesAccessToken"]))
             };
 
             return jSonWebToken;
         }
 
-        private string CreateAccessToken(IList<string> roles, string login, int id, string securityStamp)
+        private string CreateAccessToken(IEnumerable<Claim> claims) 
         {
-            var claims = roles.Select(x => new Claim(x, "")).ToList();
-            claims.Add(new Claim("login", login));
-            claims.Add(new Claim("securityStamp", securityStamp));
-            claims.Add(new Claim("userId", id.ToString()));
-
             var token = new JwtSecurityToken(
                 issuer: _configuration["jwt:issuer"],
                 audience: _configuration["jwt:audience"],
@@ -47,17 +42,18 @@ namespace EmployeeManagement.WebUI.JsonWebTokenAuthentication
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private string CreateRefreshToken(int userId)
+        private string CreateRefreshToken(IEnumerable<Claim> claims)
         {
-            var claims = new List<Claim>
+            var resultClaims = new List<Claim>
             {
-                new Claim("userId", userId.ToString()),
+                claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier),
+                claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)
             };
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["jwt:issuer"],
                 audience: _configuration["jwt:audience"],
-                claims: claims,
+                claims: resultClaims,
                 expires: DateTime.UtcNow.AddMinutes(double.Parse(_configuration["expires:expiryMinutesRefreshToken"])),
                 signingCredentials: GetCredentials());
 

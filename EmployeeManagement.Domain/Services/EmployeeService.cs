@@ -6,6 +6,7 @@ using EmployeeManagement.Domain.Interfaces;
 using EmployeeManagement.Domain.Mappings;
 using EmployeeManagement.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace EmployeeManagement.Domain.Services
 {
@@ -14,12 +15,14 @@ namespace EmployeeManagement.Domain.Services
         private readonly IMapperWrapper _mapperWrapper;
         private readonly IQueryableDbProvider _queryableDbProvider;
         private readonly IUpdateDbProvider _updateDbProvider;
+        private readonly ILogger<EmployeeService> _logger;
 
-        public EmployeeService(IMapperWrapper mapperWrapper, IUpdateDbProvider updateDbProvider, IQueryableDbProvider queryableDbProvider)
+        public EmployeeService(IMapperWrapper mapperWrapper, IUpdateDbProvider updateDbProvider, IQueryableDbProvider queryableDbProvider, ILogger<EmployeeService> logger)
         {
             _mapperWrapper = mapperWrapper;
             _updateDbProvider = updateDbProvider;
             _queryableDbProvider = queryableDbProvider;
+            _logger = logger;
         }
 
         public EmployeeModel GetById(int employeeId)
@@ -61,9 +64,13 @@ namespace EmployeeManagement.Domain.Services
 
         public List<EmployeeModel> GetByDepartmentId(int departmentId)
         {
+            _logger.LogInformation("Start method GetByDepartmentId in employee service");
             var employees = _queryableDbProvider.Set<Employee>().Include(x => x.Department).Where(x => x.DepartmentId == departmentId).ToList();
+            _logger.LogInformation("");
 
-            return _mapperWrapper.Map<List<Employee>, List<EmployeeModel>>(employees);
+            var employeeModels = _mapperWrapper.Map<List<Employee>, List<EmployeeModel>>(employees);
+
+            return employeeModels;
         }
     }
 }
